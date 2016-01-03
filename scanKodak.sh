@@ -23,7 +23,7 @@ done
 # Check if file is set
 if [[ ! "$FILE" ]]
 then
-	FILE="$(date +"%s").pdf"
+	FILE="$(date +"%F %H%M%S").pdf"
 fi
 
 echo Will output to file "$FILE"
@@ -40,8 +40,11 @@ convert $TMPFILE*.tiff $gs -quality $qual -density "$dpi"x"$dpi" -compress jpeg 
 if [[ ! -f $FILE ]]
 then
 	#File does not exist. This is easy
-	echo Creating new PDF $FILE
-	cp "$TMPFILE.all.pdf" "$FILE"
+	echo Creating new PDF $FILE and fixing title.
+	#creating tmpfile because pdftk's update_info apparently can't read inline
+	echo -en "InfoKey: Title\nInfoValue: $FILE\n" > $TMPFILE.title
+	#updating the title because "tmp.rvvk8ozNjn.pdf" just doesn't look good in the title bar, also moving the file away from tmp
+	pdftk $TMPFILE.all.pdf update_info $TMPFILE.title output "$FILE"
 else
 	#File exists. cat'ing files together
 	echo Appending to existing PDF $FILE
