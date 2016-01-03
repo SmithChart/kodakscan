@@ -2,18 +2,20 @@
 
 # Scans from a hard-coded scanner to a pdf in the current directory
 
-TMPFILE=$(tempfile)
+TMPFILE=$(mktemp)
 
 gs='-type Grayscale'
 qual='50%'
+dpi='150'
 
 # Get options
-while getopts ":f:cq" Option
+while getopts ":f:cqr:" Option
 do
   case $Option in
     f ) FILE=$OPTARG;;
-		c ) gs='';;
-		q ) qual='85%';;
+    c ) gs='';;
+    q ) qual='85%';;
+    r ) dpi=$OPTARG;;
   esac
 done
 
@@ -26,13 +28,13 @@ fi
 
 echo Will output to file "$FILE"
 
-#Scan file and create pdf
-scanimage  --format tiff -p --batch=$TMPFILE%04d.tiff --source 'ADF Duplex' --resolution 150
+#Scan pages and store .tiffs
+echo Starting scan...
+scanimage --format tiff -p --batch=$TMPFILE%04d.tiff --source 'ADF Duplex' --resolution $dpi
 
-#for f in $(ls $TMPFILE*.tiff | sort); do echo $f; convert -type Grayscale  -quality 50% $f $f.jpg; convert $f.jpg $f.jpg.pdf; done
-for f in $(ls $TMPFILE*.tiff | sort); do echo $f; convert $gs -quality $qual $f $f.jpg; convert -page A4 $f.jpg $f.jpg.pdf; done
-
-pdftk $(ls $TMPFILE*.tiff.jpg.pdf | sort) cat output $TMPFILE.all.pdf
+#use imagemagick to compress all tiffs and glue them to a single pdf
+echo Glueing pages...
+convert $TMPFILE*.tiff $gs -quality $qual -density "$dpi"x"$dpi" -compress jpeg $TMPFILE.all.pdf
 
 #Output to given file
 if [[ ! -f $FILE ]]
