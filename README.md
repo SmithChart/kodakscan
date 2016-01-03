@@ -6,4 +6,4 @@ Requires mktemp, imagemagick, xsane and pdftk.
 * -f <filename>: Filename for pdf output
 * -c : Scans colour PDFs
 * -q : Sets the JPEG-Quality a bit higher
-* -r <resolution>: default 150 dpi (up to 600 dpi possible)
+* -r <resolution>: Resolution (default 150 dpi, up to 600 dpi possible)
