@@ -2,23 +2,32 @@
 
 # Scans from a hard-coded scanner to a pdf in the current directory
 
-TMPFILE=$(mktemp)
+usage() {
+  echo "scanKodak.sh [OPTIONS...]"
+  echo
+  echo "  -f FILE    Give output file name [default: \`date +%F %H%M%S\`]"
+  echo "  -c         Scan in color [default: gray scale]"
+  echo "  -q         Set output JPEG quality to 85% [default: 50%]"
+  echo "  -r RES     Set resolution in dpi [default 150 dpi]"
+}
 
 gs='-type Grayscale'
 qual='50%'
 dpi='150'
 
 # Get options
-while getopts ":f:cqr:" Option
+while getopts ":f:cqrh:" Option
 do
   case $Option in
     f ) FILE=$OPTARG;;
     c ) gs='';;
     q ) qual='85%';;
     r ) dpi=$OPTARG;;
+    h ) usage; exit;;
   esac
 done
 
+TMPFILE=$(mktemp)
 
 # Check if file is set
 if [[ ! "$FILE" ]]
