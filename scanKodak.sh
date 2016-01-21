@@ -16,7 +16,7 @@ qual='50%'
 dpi='150'
 
 # Get options
-while getopts ":f:cqrh:" Option
+while getopts ":f:cqr:h" Option
 do
   case $Option in
     f ) FILE=$OPTARG;;
