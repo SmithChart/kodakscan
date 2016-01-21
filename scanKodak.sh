@@ -10,6 +10,7 @@ usage() {
   echo "  -c         Scan in color [default: gray scale]"
   echo "  -q         Set output JPEG quality to 85% [default: 50%]"
   echo "  -r RES     Set resolution in dpi [default 150 dpi]"
+  echo "  -# NUM     Number of pages to scan"
   echo
   echo "Source selection:"
   echo "  -s    Specify scan source: Normal | ADF Front | ADF Back | ADF Duplex"
@@ -24,9 +25,10 @@ gs='-type Grayscale'
 qual='50%'
 dpi='150'
 paper_source='ADF Duplex'
+page_count=''
 
 # Get options
-while getopts ":f:cqr:s:odnh" Option
+while getopts ":f:cqr:s:odn#:h" Option
 do
   case $Option in
     f ) FILE=$OPTARG;;
@@ -36,7 +38,8 @@ do
     s ) paper_source=$OPTARG;;
     o ) paper_source='ADF Front';;
     d ) paper_source='ADF Duplex';;
-    n ) paper_source='Normal';;
+    n ) paper_source='Normal'; page_count='--batch-count=1';;
+    '#' ) page_count="--batch-count=$OPTARG";;
     h ) usage; exit;;
   esac
 done
@@ -53,7 +56,7 @@ echo Will output to file "$FILE"
 
 #Scan pages and store .tiffs
 echo Starting scan...
-scanimage --format tiff -p --batch=$TMPFILE%04d.tiff --source "$paper_source" --resolution $dpi
+scanimage --format tiff -p --batch=$TMPFILE%04d.tiff $page_count --source "$paper_source" --resolution $dpi
 
 #use imagemagick to compress all tiffs and glue them to a single pdf
 echo Glueing pages...
