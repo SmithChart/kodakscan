@@ -57,6 +57,10 @@ echo Will output to file "$FILE"
 #Scan pages and store .tiffs
 echo Starting scan...
 scanimage --format tiff -p --batch=$TMPFILE%04d.tiff $page_count --source "$paper_source" --resolution $dpi
+if [ ! -e $TMPFILE*.tiff ]; then
+	echo "Errors while scanning. Exiting without action."
+	exit 1
+fi
 
 #use imagemagick to compress all tiffs and glue them to a single pdf
 echo Glueing pages...
